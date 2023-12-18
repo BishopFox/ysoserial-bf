@@ -6,7 +6,7 @@ This is a fork of [ysoserial](https://github.com/frohoff/ysoserial) that incorpo
 
 The original motivation for this fork was to add support for the nonstandard serialization format used by Google Web Toolkit (GWT). To output in GWT format, add the `--gwt` option, with a field name, e.g. `--gwt default`, `--gwt bishopfox`, etc. It's not necessary to pick a valid field name, but GWT will get a little farther in its deserialization logic if the field name is valid for the type of object the payload is being injected into, and this might be beneficial in some cases.
 
-You can try out the GWT serialization output feature using [the example vulnerable GWT web app](https://github.com/BishopFox/VulnerableGWTApp) discussed in [the Bishop Fox blog post "GWT: An Eight-Year-Old Unpatched Java Deserialization Vulnerability"](https://bishopfox.com/blog)
+You can try out the GWT serialization output feature using [the example vulnerable GWT web app](https://github.com/BishopFox/VulnerableGWTApp) discussed in [the Bishop Fox blog post "GWT: An Eight-Year-Old Unpatched Java Deserialization Vulnerability"](https://bishopfox.com/blog/gwt-unpatched-unauthenticated-java-deserialization-vulnerability)
 
 ## Merged back-catalogue pull requests
 
