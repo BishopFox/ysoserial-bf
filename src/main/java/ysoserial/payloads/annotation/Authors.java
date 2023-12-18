@@ -25,6 +25,13 @@ public @interface Authors {
     String EDOARDOVIGNATI = "EdoardoVignati";
     String JANG = "Jang";
     String ARTSPLOIT = "artsploit";
+	String SSEELEY = "steven_seeley";
+    String RCALVI = "rocco_calvi";
+	String HUGOW = "hugow";
+	String Firebasky = "Firebasky";
+    String K4n5ha0 = "k4n5ha0";
+    String BLINCOLN = "blincoln-bf";
+	String POTATS0 = "potats0";
 
     String[] value() default {};
 

