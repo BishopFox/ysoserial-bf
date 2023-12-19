@@ -26,11 +26,25 @@ This fork also includes content from 11 unmerged pull requests in the mainline p
 
 # Usage
 
-First, compile the code using the same steps as for the main project:
+You can try skipping the build steps below and using the precompiled JAR file available in the releases list for this repo.
+
+Otherwise, compile the code using the same steps as for the main project (version 11 JRE, etc.):
 
 ```
 mvn clean package -DskipTests
 ```
+
+You may receive errors similar to the following, depending on your Linux distribution, how long you've had Maven installed on it, etc.:
+
+```
+[WARNING] The POM for javax.interceptor:javax.interceptor-api:jar:3.1 is missing, no dependency information available
+...omitted for brevity...
+[ERROR] Failed to execute goal on project ysoserial: Could not resolve dependencies for project ysoserial:ysoserial:jar:0.0.6-SNAPSHOT: The following artifacts could not be resolved: javax.interceptor:javax.interceptor-api:jar:3.1 (absent): javax.interceptor:javax.interceptor-api:jar:3.1 was not found in
+https://repo.jenkins-ci.org/public/
+during a previous attempt. This failure was cached in the local repository and resolution is not reattempted until the update interval of jenkins has elapsed or updates are forced -> [Help 1]
+```
+
+If so, unpack the file `lib/javax.interceptor-api-3.1.tar.gz` into your user-level Maven directory (usually `~/.m2`). Doing so should result in the creation of a subdirectory named `repository/javax/interceptor/javax.interceptor-api` containing at least four files. The root cause is that the 3.1 library was built, released, and many projects added it as a depenedency, then [the maintainers decided it was a mistake and deleted the library](https://github.com/jakartaee/interceptors/issues/4). This repo may be updated at a later date to use a different version of the library so that this step is not necessary.
 
 Once compiled, using this fork of `ysoserial` is the same as the standard version unless you want to output in GWT mode.
 
