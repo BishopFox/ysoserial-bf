@@ -70,7 +70,7 @@ https://repo.jenkins-ci.org/public/
 during a previous attempt. This failure was cached in the local repository and resolution is not reattempted until the update interval of jenkins has elapsed or updates are forced -> [Help 1]
 ```
 
-If so, unpack the file `lib/javax.interceptor-api-3.1.tar.gz` into your user-level Maven directory (usually `~/.m2`). Doing so should result in the creation of a subdirectory named `repository/javax/interceptor/javax.interceptor-api` containing at least four files. The root cause is that the 3.1 library was built, released, and many projects added it as a depenedency, then [the maintainers decided it was a mistake and deleted the library](https://github.com/jakartaee/interceptors/issues/4). This repo may be updated at a later date to use a different version of the library so that this step is not necessary.
+If so, unpack the file `lib/javax.interceptor-api-3.1.tar.gz` into your user-level Maven directory (usually `~/.m2`). Doing so should result in the creation of a subdirectory named `repository/javax/interceptor/javax.interceptor-api/3.1` containing at least four files. The root cause is that the 3.1 library was built, released, and many projects added it as a depenedency, then [the maintainers decided it was a mistake and deleted the library](https://github.com/jakartaee/interceptors/issues/4). This repo may be updated at a later date to use a different version of the library so that this step is not necessary.
 
 ### Newer versions of Maven may require pom.xml syntax update
 
