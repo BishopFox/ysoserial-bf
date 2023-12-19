@@ -34,6 +34,32 @@ Otherwise, compile the code using the same steps as for the main project (versio
 mvn clean package -DskipTests
 ```
 
+Once compiled, using this fork of `ysoserial` is the same as the standard version unless you want to output in GWT mode.
+
+```
+Usage: java -jar ysoserial-[version]-all.jar [options] <payload> '<command>'
+  Options:
+    -h,--help                  Print usage
+    -G,--gwt <field name>      Output in Google Web Toolkit (GWT) serialization format:
+      ex. --gwt default
+```
+
+## Build error troubleshooting
+
+### ysoserial requires Java 11
+
+You may receive errors similar to the following if you attempt to compile `ysoserial` using a Java runtime newer than version 11:
+
+```
+[ERROR] Failed to execute goal org.apache.maven.plugins:maven-compiler-plugin:3.5.1:compile (default-compile) on project ysoserial: Compilation failure: Compilation failure: 
+[ERROR] error: Source option 6 is no longer supported. Use 7 or later.
+[ERROR] error: Target option 6 is no longer supported. Use 7 or later.
+```
+
+As briefly mentioned above, Java 11 is required to build the standard version of `ysoserial`, as well as this fork. You will need to install a version 11 JRE (make sure it is not headless, as X Window support is required), and then configure your system/session to use that JRE by default. For example, you could updated your `JAVA_HOME` environment variable to point to the JDK 11 home directory in the same terminal session as the one where you're running `mvn` commands. When you run the `java -version` command in that session, it should indicate some variation of 11, or the build will fail. The steps for installing and configuring a specific JRE depend greatly on your OS and other factors.
+
+### Missing javax.interceptor-api library
+
 You may receive errors similar to the following, depending on your Linux distribution, how long you've had Maven installed on it, etc.:
 
 ```
@@ -46,15 +72,16 @@ during a previous attempt. This failure was cached in the local repository and r
 
 If so, unpack the file `lib/javax.interceptor-api-3.1.tar.gz` into your user-level Maven directory (usually `~/.m2`). Doing so should result in the creation of a subdirectory named `repository/javax/interceptor/javax.interceptor-api` containing at least four files. The root cause is that the 3.1 library was built, released, and many projects added it as a depenedency, then [the maintainers decided it was a mistake and deleted the library](https://github.com/jakartaee/interceptors/issues/4). This repo may be updated at a later date to use a different version of the library so that this step is not necessary.
 
-Once compiled, using this fork of `ysoserial` is the same as the standard version unless you want to output in GWT mode.
+### Newer versions of Maven may require pom.xml syntax update
+
+You may receive the following error if you are using a newer version of Maven:
 
 ```
-Usage: java -jar ysoserial-[version]-all.jar [options] <payload> '<command>'
-  Options:
-    -h,--help                  Print usage
-    -G,--gwt <field name>      Output in Google Web Toolkit (GWT) serialization format:
-      ex. --gwt default
+[ERROR] Failed to execute goal org.apache.maven.plugins:maven-assembly-plugin:3.6.0:single (make-assembly) on project ysoserial: Execution make-assembly of goal org.apache.maven.plugins:maven-assembly-plugin:3.6.0:single failed: parameter 'descriptor' has been removed from the plugin, please verify documentation. -> [Help 1]
+[ERROR]
 ```
+
+If so, replace the existing `pom.xml` file with the content of the `pom-newer_maven.xml` file.
 
 # Quickly trying all command execution payloads
 
